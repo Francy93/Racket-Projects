@@ -178,7 +178,10 @@
             [   (or (list? (first E)) );(equal? "|"(last(first E)))  (equal? "*"(last(first E)))  (equal? "+"(last(first E))) )
                 (cond
                     [   (or (equal? "|"(last(first E))) 
-                            (and(or(equal? "*"(last(first E)))(equal?"+"(last(first E))))(= 2(length(first E)))(list?(first(first E))) )
+                            (and(or(equal? "*"(last(first E)))(equal?"+"(last(first E))))
+                                (= 2(length(first E)))
+                                (if(list?(first(first E))) (equal? "|"(last(first E))) #f)
+                            )
                         )
                         (if (equal? "|"(last(first E)))
                             (for-each(lambda(x) (when (= DONE 0)(LOOP S (cons x (rest E)))) )(reverse(rest(reverse(first E)))))
