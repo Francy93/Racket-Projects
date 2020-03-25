@@ -64,12 +64,12 @@
             [   (or (and(empty? S) (< OR 1))                          (equal? "|" (if (not(empty? S))(last S)empty))
                     (equal? "+"(if (not(empty? S))(first S)empty))    (equal? "*"(if (not(empty? S))(first S)empty))
                     (and(equal?"|"(if (>(length S)2)(second S)empty)) (or (equal? ")" (third S)) (equal? "+" (third S)) (equal? "*" (third S)) ))
-                    (and (< PAR 2)                                    (equal? ")" (if (not(empty? S))(first S)empty)))
-                    (and (not(for/or ([i S]) (i . equal? . ")")))     (equal? "(" (if (not(empty? S))(first S)empty)) )
+                    (and (< PAR 2)                                    (equal? ")" (if (not(empty? S))(first S)empty)) )
+                    (and (<  (count (λ(x)(equal? x ")")) S)  PAR)     (equal? "(" (if (not(empty? S))(first S)empty)) )
                 )      ;(displayln(~a "SSSSSSSSSSSSS" S))
                     (cond 
                         [   (and (empty? S) (equal? PAR 1))   (set! EXPRESSION_LIST TEMP)  ]   ; END !!!!!!!!!!!!!!!!!!!!!!!!!
-                        [   (or (and (< PAR 2) (equal? ")" (first S)))    (and (not(for/or ([i S]) (i . equal? . ")"))) (equal? "(" (first S))) )
+                        [   (or (and (< PAR 2) (equal? ")" (first S)))    (and (<  (count (λ(x)(equal? x ")")) S)  PAR) (equal? "(" (first S))) )
                             (displayln "Brackets correction 111")         (LOOP (rest S) TEMP PAR OR OR2)     
                         ]
                         [   (and(equal?"|"(if (> (length S)1) (second S) empty))
