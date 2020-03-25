@@ -167,12 +167,12 @@
  
     (define-values (I DONE) (values 0 0))
     (let LOOP [(S SEQUENCE_LIST) (E (list EXPRESSION_LIST))]
-      ;(displayln (~a "String "S "    Equation "E))
+                                                                      ;(displayln (~a "String "S "    Expression "E))
         (cond
-            [   (or (empty? S) (empty? E))
+            [   (and(or (empty? S) (empty? E)) (not (list? (if (< 0 (length E)) (first E) 0)))  )
                 (if (and (empty? S) (empty? E))
-                    (let () (set! I 1) (set! DONE 1))  ;(displayln "Sequence and Espression match!")   ]
-                    null  ;(displayln "Some of them isn't empty")   ]
+                    (let () (set! I 1) (set! DONE 1))                 ;(displayln "Sequence and Espression match!")   ]
+                    null                                              ;(displayln "Some of them isn't empty")         ]
                 )
             ]
             [   (or (list? (first E)) );(equal? "|"(last(first E)))  (equal? "*"(last(first E)))  (equal? "+"(last(first E))) )
