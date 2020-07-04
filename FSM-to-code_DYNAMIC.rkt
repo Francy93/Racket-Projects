@@ -67,30 +67,30 @@
                     (and (< PAR 2)                                    (equal? ")" (if (not(empty? S))(first S)empty)) )
                     (and (<  (count (λ(x)(equal? x ")")) S)  PAR)     (equal? "(" (if (not(empty? S))(first S)empty)) )
                 )      ;(displayln(~a "SSSSSSSSSSSSS" S))
-                    (cond 
-                        [   (and (empty? S) (equal? PAR 1))   (set! EXPRESSION_LIST TEMP)  ]   ; END !!!!!!!!!!!!!!!!!!!!!!!!!
-                        [   (or (and (< PAR 2) (equal? ")" (first S)))    (and (<  (count (λ(x)(equal? x ")")) S)  PAR) (equal? "(" (first S))) )
-                            (displayln "Brackets correction 111")         (LOOP (rest S) TEMP PAR OR OR2)     
-                        ]
-                        [   (and(equal?"|"(if (> (length S)1) (second S) empty))
-                                (or (equal? ")" (if (< (length S)3) empty (third S)))
-                                    (equal? "+" (if (< (length S)3) empty (third S)))
-                                    (equal? "*" (if (< (length S)3) empty (third S)))
-                                )
-                            )       (displayln "ORs, Simbols or brackets correction 222")
-                            (if (or(= 4 (length S))   (equal? ")" (fourth S)))  
-                                (LOOP (cons (first S)(rest(rest S))) TEMP PAR OR OR2)
-                                (LOOP (cons (first S)(cons (second S)(rest(rest(rest S))))) TEMP PAR OR OR2)
+                (cond 
+                    [   (and (empty? S) (equal? PAR 1))   (set! EXPRESSION_LIST TEMP)  ]   ; END !!!!!!!!!!!!!!!!!!!!!!!!!
+                    [   (or (and (< PAR 2) (equal? ")" (first S)))    (and (<  (count (λ(x)(equal? x ")")) S)  PAR) (equal? "(" (first S))) )
+                        (displayln "Brackets correction 111")         (LOOP (rest S) TEMP PAR OR OR2)     
+                    ]
+                    [   (and(equal?"|"(if (> (length S)1) (second S) empty))
+                            (or (equal? ")" (if (< (length S)3) empty (third S)))
+                                (equal? "+" (if (< (length S)3) empty (third S)))
+                                (equal? "*" (if (< (length S)3) empty (third S)))
                             )
-                        ]
-                        [   (or (equal? "+"(if (= 0 (length S)) empty (first S)))   (equal? "*"(if (= 0 (length S)) empty (first S))))
-                            (displayln "Simbols correction 333")                    (LOOP (rest S) TEMP PAR OR OR2)
-                        ]
-                        [   (equal? "|"(if (= 0 (length S)) empty (last S)))        (displayln "ORs correction 444")  
-                            (LOOP (reverse (rest (reverse S))) TEMP PAR OR OR2)
-                        ]
-                        [   else    (displayln (~a" Wrong amount of brackets or simbols"))     (set! JUMP '("|"))   ]
-                    )
+                        )       (displayln "ORs, Simbols or brackets correction 222")
+                        (if (or(= 4 (length S))   (equal? ")" (fourth S)))  
+                            (LOOP (cons (first S)(rest(rest S))) TEMP PAR OR OR2)
+                            (LOOP (cons (first S)(cons (second S)(rest(rest(rest S))))) TEMP PAR OR OR2)
+                        )
+                    ]
+                    [   (or (equal? "+"(if (= 0 (length S)) empty (first S)))   (equal? "*"(if (= 0 (length S)) empty (first S))))
+                        (displayln "Simbols correction 333")                    (LOOP (rest S) TEMP PAR OR OR2)
+                    ]
+                    [   (equal? "|"(if (= 0 (length S)) empty (last S)))        (displayln "ORs correction 444")  
+                        (LOOP (reverse (rest (reverse S))) TEMP PAR OR OR2)
+                    ]
+                    [   else    (displayln (~a" Wrong amount of brackets or simbols"))     (set! JUMP '("|"))   ]
+                )
             ] 
               ;-  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  ORs ITERATIONS -  -  -  -  -  -  -  -  -  -  -  -   
             [   (or (equal? "|" (if(not(empty? S))(first S)empty)) (and (< (length S) 2)(> OR 0)) (and (>= OR PAR) (> PAR 1) (equal? ")" (first S))) )
@@ -163,7 +163,7 @@
 
 
 
-;-------------------------------------------- COMPARE SEQUENCE TO MACHINE EXPRESSION --------------------------------------------
+;-------------------------------------------- MACHINE SEQUENCE AND MACHINE EXPRESSION COMPARISON --------------------------------------------
  
     (define-values (I DONE) (values 0 0))
     (let LOOP [(S SEQUENCE_LIST) (E (list EXPRESSION_LIST))]
@@ -195,14 +195,14 @@
                                    (when (= DONE 0)      (let LOOP2 [(X (first E)) (BREACK 0)]
                                        (LOOP S (append X (rest E)) )
                                        (when(and (= I 0) (= DONE 0) (< BREACK (length(flatten S))))  (LOOP2 (append(first E) X) (add1 BREACK)) )
-                                       (set! I 0) ;this latter is useless
+                                       ;(set! I 0) ;this latter is useless
                                    )                     )
                             )
                             (let() (set! E (cons(reverse(rest(reverse (first E)))) (rest E)) )
                                    (when (= DONE 0)      (let LOOP3 [(X (first E)) (BREACK 0)]
                                        (LOOP S (append X (rest E)) )
                                        (when(and (= I 0) (= DONE 0) (< BREACK (length(flatten S))))  (LOOP3 (append(first E) X) (add1 BREACK)) )
-                                       (set! I 0) ;this latter is useless
+                                       ;(set! I 0) ;this latter is useless
                                    )                     )
                             )
                         )
@@ -216,7 +216,7 @@
                     (LOOP (cons (rest (first S)) (rest S)) (rest E)) 
                 )
             ]
-            [   else  null  ] ;(displayln "different") (set! I 1) ]
+            ;[   else  null  ] ;(displayln "different") (set! I 1) ]
         )
     )
 
