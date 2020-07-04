@@ -224,8 +224,8 @@
 
 ;----------------------------------------------------------- OUTCOME -----------------------------------------------------------
   
-    (displayln (~a "String   = " SEQUENCE "            HumanEXPRESSION = " EXPRESSION)) 
-    (displayln (~a "Sequence = " SEQUENCE_LIST  "    MachineEXPRESSION = " EXPRESSION_LIST ))
+    (displayln (~a "HumanSEQUENCE   = " SEQUENCE "            HumanEXPRESSION = " EXPRESSION)) 
+    (displayln (~a "MachineSEQUENCE = " SEQUENCE_LIST  "    MachineEXPRESSION = " EXPRESSION_LIST ))
     (newline)  
     (cond 
         [   (= DONE 1)    (displayln "Sequence and Espression match!")   ]
