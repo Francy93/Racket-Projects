@@ -12,17 +12,17 @@
 )
 
 (define (SETTLER STR)
-    (let LOOP [ (C (char->list STR)) (TEMP_L empty) (TEMP_S "") ]
+    (let LOOP [ (C (char->list STR)) (TEMP_L empty) (TEMP_S empty) ]
         ;(println STR) (println C) (println TEMP_L) (println TEMP_S)
         (cond
-            [   (empty? C) (set! STR (if (equal? "" TEMP_S) TEMP_L (reverse(cons TEMP_S (reverse TEMP_L)))))  STR   ]  ;(displayln STR) ]
+            [   (empty? C) (set! STR (if (empty? TEMP_S) TEMP_L (reverse(cons TEMP_S (reverse TEMP_L)))))  STR   ]  ;(displayln STR) ]
             [   (or (equal? "|" (first C)) (equal? "*" (first C)) (equal? "+" (first C)) (equal? ")" (first C)) (equal? "(" (first C)) )
-                (LOOP  (rest C)  (reverse(cons (first C)(if (equal? "" TEMP_S)(reverse TEMP_L)(cons TEMP_S (reverse TEMP_L)))))  "" )
+                (LOOP  (rest C)  (reverse(cons (first C)(if (empty? TEMP_S)(reverse TEMP_L)(cons TEMP_S (reverse TEMP_L)))))  empty )
             ]
-            [   (equal? " " (first C))   (LOOP  (rest C)  (if (equal? "" TEMP_S) TEMP_L (reverse(cons TEMP_S (reverse TEMP_L))))  "" )  ]
-            [   else   (LOOP  (rest C)  TEMP_L  (~a TEMP_S (first C))  )   ]
+            [   (equal? " " (first C))   (LOOP  (rest C)  (if (empty? TEMP_S) TEMP_L (reverse(cons TEMP_S (reverse TEMP_L))))  empty )  ]
+            [   else   (LOOP  (rest C)  TEMP_L  (reverse(cons (first C)(reverse TEMP_S)) )  )   ]
         )
-    )
+    ) 
 )
 
 
@@ -34,14 +34,14 @@
 
 
 (define (FSM2 SEQUENCE EXPRESSION)
-;----------------------------------------------- FROM STRING TO LIST OF STRINGS ----------------------------------------
+;----------------------------------------------- FROM STRING TO LIST OF STRINGS --------------------------------------------
     (newline)  
-    (unless (list? SEQUENCE)   (set! SEQUENCE   (if (string-contains? SEQUENCE   " ") (SETTLER SEQUENCE  ) (char->list SEQUENCE  ))) )
+    (unless (list? SEQUENCE)   (set! SEQUENCE    (char->list (string-replace SEQUENCE " " "")  )) ) ;removing any spaces
     (unless (list? EXPRESSION) (set! EXPRESSION (if (string-contains? EXPRESSION " ") (SETTLER EXPRESSION) (char->list EXPRESSION))) )
 
 
 
-;----------------------------------------- FROM HUMAN SEQUENCE TO MACHINE SEQUENCE ----------------------------------------
+;------------------------------------------- FROM HUMAN SEQUENCE TO MACHINE SEQUENCE ---------------------------------------
     
     (define SEQUENCE_LIST empty)
     (let LOOP [   (S SEQUENCE)     (TEMP empty)   ]
@@ -228,8 +228,8 @@
     (displayln (~a "MachineSEQUENCE = " SEQUENCE_LIST  "    MachineEXPRESSION = " EXPRESSION_LIST ))
     (newline)  
     (cond 
-        [   (= DONE 1)    (displayln "Sequence and Espression match!")   ]
-        [   else   (displayln "Sequence and Espression do not match!")   ]
+        [   (= DONE 1)    (displayln "Sequence and Expression match!")   ]
+        [   else   (displayln "Sequence and Expression do not match!")   ]
     )
     (newline) (newline)  
 )
@@ -240,4 +240,7 @@
 ;||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| TESTS ||||||||||||||||||||||||||||||||||||||||||||||||
 
  ;(FSM2 "aabbbc" "ab*|ab*ab*c")
- (FSM2 "stop right go 1sec 1sec"  "go* 1sec* stop (left | right) go 1sec+")
+ ;(FSM2 "ciaohellocd" "a*(ciao|hello)* cd")
+ (FSM2 "stop right go 1sec 1sec"  "go* 1sec* stop (left |right) go 1sec+")
+ ;(FSM2 "stoprightgo1sec1sec"  " (go)*(1sec)  *stop(left  | right)go(1sec)+")
+ ;(FSM2 "stoprightgo1sec1sec"  "(go)*(1sec)*stop(left|right)go(1sec)+")
