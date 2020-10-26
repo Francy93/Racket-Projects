@@ -36,7 +36,7 @@
 (define (FSM SEQUENCE EXPRESSION)
 ;----------------------------------------------- FROM STRING TO LIST OF STRINGS --------------------------------------------
     (newline)  
-    (unless (list? SEQUENCE)   (set! SEQUENCE    (char->list (string-replace SEQUENCE " " "")  )) ) ;removing any spaces
+    (unless (list? SEQUENCE)   (set! SEQUENCE   (char->list (string-replace SEQUENCE " " "")  )) ) ;removing any spaces
     (unless (list? EXPRESSION) (set! EXPRESSION (if (string-contains? EXPRESSION " ") (SETTLER EXPRESSION) (char->list EXPRESSION))) )
 
 
@@ -47,7 +47,7 @@
     (let LOOP [   (S SEQUENCE)     (TEMP empty)   ]
         ;(println S) (println TEMP)
         (cond
-            [   (empty? S) (set! SEQUENCE_LIST (reverse (cons TEMP SEQUENCE_LIST)))   ]
+            [   (empty? S) (set! SEQUENCE_LIST (if (empty? SEQUENCE) empty (reverse (cons TEMP SEQUENCE_LIST))) )   ]            ;debugger empty SEQUENCE (26/10/20)
             [   (or (empty? TEMP) (equal? (first S) (last TEMP)) )   (set! TEMP (cons (first S) TEMP))   (LOOP (rest S) TEMP)   ]
             [   else   (set! SEQUENCE_LIST (cons TEMP SEQUENCE_LIST))    (LOOP S empty)   ]
         )
@@ -231,7 +231,7 @@
                     [   else   #|(displayln "else")|#   (LOOP S (append (first E) (rest E)) )   ]
                 )
             ]
-            [   (equal? (first E) (first(first S)))         ;(displayln "equal")
+            [   (equal? (first E)  (if (empty? (first S))empty (first(first S))) )         ;(displayln "equal")      ;done not necessary debugging empty list (26/10/20) !!!
                 (if (= 1 (length(first S)))
                     (LOOP (rest S) (rest E))    ;deleting the "S" empty list and going ahead
                     (LOOP (cons (rest (first S)) (rest S)) (rest E)) 
@@ -260,11 +260,11 @@
 
 ;||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| TESTS ||||||||||||||||||||||||||||||||||||||||||||||||
 
- (FSM "aabbac" "|ab*(|(|a | z(|))b*|)ab*c|(a(h|p(|)")
+ ;(FSM "aabbac" "|ab*(|(|a | z(|))b*|)ab*c|(a(h|p(|)")
  ;(FSM "ciaohellocd" "a*(ciao|hello)* cd")
- ;(FSM "stop right go 1sec 1sec"  "go* 1sec* stop (left |right) go 1sec+")
+ (FSM "stop right go 1sec 1sec"  "go* 1sec* stop (left |right) go 1sec+")
  ;(FSM "stoprightgo1sec1sec"  " (go)*(1sec)  *stop(left  | right)go(1sec)+")
  ;(FSM "stoprightgo1sec1sec"  "(go)*(1sec)*stop(left|right)go(1sec)+")
  ;(FSM "ppsssk" "(h|k(|)")
  ;(FSM "abc" "|a(|bc")
- ;(FSM "abc" "a|(b c)*")
+ ;(FSM "b c bc" "a|(b c)*")
