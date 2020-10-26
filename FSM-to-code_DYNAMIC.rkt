@@ -33,7 +33,7 @@
 ;|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 
-(define (FSM2 SEQUENCE EXPRESSION)
+(define (FSM SEQUENCE EXPRESSION)
 ;----------------------------------------------- FROM STRING TO LIST OF STRINGS --------------------------------------------
     (newline)  
     (unless (list? SEQUENCE)   (set! SEQUENCE    (char->list (string-replace SEQUENCE " " "")  )) ) ;removing any spaces
@@ -55,48 +55,69 @@
 
 
 
-;----------------------------------------- FROM HUMAN EXPRESSION TO MACHINE EXPRESSION --------------------------------------------
+;----------------------------------------- CONVERSION FROM HUMAN EXPRESSION TO MACHINE EXPRESSION --------------------------------------------
 
     (define-values (EXPRESSION_LIST TEMP_BR TEMP_OR JUMP) (values empty empty empty empty))
     (let LOOP [   (S EXPRESSION)     (TEMP empty)     (PAR 1)     (OR 0)    (OR2 empty)    ]
         ;(displayln (~a "par"PAR "  " "or"OR "   " "temp"TEMP "       " "tempBr"TEMP_BR "       " "tempOr"TEMP_OR "    OORR2" S) )
-        (cond ;-  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - END OR CORRECTIONS -  -  -  -  -  -  -  -  -  -  -  -   
-            [   (or (and(empty? S) (< OR 1))                          (equal? "|" (if (not(empty? S))(last S)empty))
-                    (equal? "+"(if (not(empty? S))(first S)empty))    (equal? "*"(if (not(empty? S))(first S)empty))
+        (cond ;-  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  END of CONVERSION  -  -  -  -  -  -  -  -  -  -  -  -  -
+            [   (and(empty? S) (< OR 1))     (and (empty? S) (equal? PAR 1))   (set! EXPRESSION_LIST TEMP)  ]   ; END !!!!!!!!!!!!!!!!!!!!!!!!!
+            
+              ;-  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  CORRECTIONS HANDLING  -  -  -  -  -  -  -  -  -  -  -  -
+            [   (or (equal? "+"(if (not(empty? S))(first S)empty))    (equal? "*"(if (not(empty? S))(first S)empty))
+                    (equal? "|" (if (not(empty? S))(last S)empty))    (and(empty? TEMP)(equal? "|" (if (not(empty? S))(first S)empty)))
                     (and(equal?"|"(if (>(length S)2)(second S)empty)) (or (equal? ")" (third S)) (equal? "+" (third S)) (equal? "*" (third S)) ))
                     (and (< PAR 2)                                    (equal? ")" (if (not(empty? S))(first S)empty)) )
                     (and (<  (count (λ(x)(equal? x ")")) S)  PAR)     (equal? "(" (if (not(empty? S))(first S)empty)) )
-                )      ;(displayln(~a "SSSSSSSSSSSSS" S))
+                )      (displayln(~a "EXEPTIONS HANDLING: " S))
                 (cond 
-                    [   (and (empty? S) (equal? PAR 1))   (set! EXPRESSION_LIST TEMP)  ]   ; END !!!!!!!!!!!!!!!!!!!!!!!!!
-                    [   (or (and (< PAR 2) (equal? ")" (first S)))    (and (<  (count (λ(x)(equal? x ")")) S)  PAR) (equal? "(" (first S))) )
-                        (displayln "Brackets correction 111")         (LOOP (rest S) TEMP PAR OR OR2)     
-                    ]
+                    
+                    [   (and (< PAR 2) (equal? ")" (first S))) (displayln "Brackets correction 1")  (LOOP (rest S) TEMP PAR OR OR2)   ]
+                    [   (and (< (count (λ(x)(equal? x ")")) S) PAR)  (equal? "(" (if (empty? S) empty (first S))) )         ; modified on (26/10/20)
+                           (displayln "Brackets and ORs correction 1.2")
+                           (LOOP (if (equal? "|" (second S))(rest(rest S))(rest S)) TEMP PAR OR OR2)
+                    ]                        
                     [   (and(equal?"|"(if (> (length S)1) (second S) empty))
                             (or (equal? ")" (if (< (length S)3) empty (third S)))
                                 (equal? "+" (if (< (length S)3) empty (third S)))
                                 (equal? "*" (if (< (length S)3) empty (third S)))
                             )
-                        )       (displayln "ORs, Simbols or brackets correction 222")
-                        (if (or(= 4 (length S))   (equal? ")" (fourth S)))  
-                            (LOOP (cons (first S)(rest(rest S))) TEMP PAR OR OR2)
-                            (LOOP (cons (first S)(cons (second S)(rest(rest(rest S))))) TEMP PAR OR OR2)
+                        )       (displayln "ORs, Simbols or brackets correction 2")
+                        (cond
+                            [   (equal? ")" (if (>=(length S)4) (fourth S) empty))                                                 ;section debugged START (26/10/20)
+                                (displayln "ORs correction 2.1")   (LOOP (cons (first S)(rest(rest S))) TEMP PAR OR OR2)
+                            ]
+                            [   (equal? "(" (if (>=(length S)4) (fourth S) empty))                                                 
+                                (if (>(length S)4)
+                                    (let () (displayln "ORs correction 2.2")
+                                            (LOOP (cons (first S)(rest(rest S))) TEMP PAR OR OR2)
+                                    )
+                                    (let () (displayln "ORs and Brakets correction 2.3")
+                                            (LOOP (cons (first S)(cons (third S)(rest(rest(rest(rest S)))))) TEMP PAR OR OR2)
+                                    )
+                                )
+                            ]
+                            [   else   (displayln "ORs correction 2.4") (LOOP (cons (first S)(rest(rest S))) TEMP PAR OR OR2)   ]  ;section debugged END (26/10/20)
                         )
                     ]
                     [   (or (equal? "+"(if (= 0 (length S)) empty (first S)))   (equal? "*"(if (= 0 (length S)) empty (first S))))
-                        (displayln "Simbols correction 333")                    (LOOP (rest S) TEMP PAR OR OR2)
+                        (displayln "Simbols correction 3")                    (LOOP (rest S) TEMP PAR OR OR2)
                     ]
-                    [   (equal? "|"(if (= 0 (length S)) empty (last S)))        (displayln "ORs correction 444")  
-                        (LOOP (reverse (rest (reverse S))) TEMP PAR OR OR2)
+                    [   (or (equal? "|"(if (= 0 (length S)) empty (last S))) (and(empty? TEMP)(equal? "|" (if (not(empty? S))(first S)empty))) )
+                        (displayln "ORs correction 4")  
+                        (if (equal? "|"(if (= 0 (length S)) empty (last S)))
+                            (LOOP (reverse (rest (reverse S))) TEMP PAR OR OR2)
+                            (LOOP (rest S) TEMP PAR OR OR2)
+                        )
                     ]
                     [   else    (displayln (~a" Wrong amount of brackets or simbols"))     (set! JUMP '("|"))   ]
                 )
             ] 
-              ;-  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  ORs ITERATIONS -  -  -  -  -  -  -  -  -  -  -  -   
+              ;-  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  ORs ITERATIONS  -  -  -  -  -  -  -  -  -  -  -  -   
             [   (or (equal? "|" (if(not(empty? S))(first S)empty)) (and (< (length S) 2)(> OR 0)) (and (>= OR PAR) (> PAR 1) (equal? ")" (first S))) )
                 (cond
                     [   (or (and (< (length S) 2)(> OR 0))   (and (>= OR PAR) (equal? ")" (if (not (empty? S)) (first S) empty)) ) )
-                        (if (and (< (length S) 2)(> OR 0)) 
+                        (if (and (< (length S) 2)(> OR 0)    (not(equal? ")" (if (not (empty? S)) (first S) empty)))   )           ;bug fixed (26/10/20)
                             (set!-values (JUMP TEMP_OR)
                                 (values (if (not(empty? S)) (rest S) empty)
                                         (if (>  (length OR2 ) 0)
@@ -132,7 +153,7 @@
                         )                                           )
                     ]
                 )
-            ] ;-  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - BRACKETS ITERATIONS -  -  -  -  -  -  -  -  -  -  -  -   
+            ] ;-  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  BRACKETS ITERATIONS  -  -  -  -  -  -  -  -  -  -  -  -   
             [   (or (equal? "(" (first S)) (and (> PAR 1) (equal? ")" (first S))) )
                 (cond
                     [   (equal? "(" (first S))
@@ -149,14 +170,14 @@
                                 )
                     ]
                 )
-            ] ;-  -  -  -  -  -  -  -  -  -  -  -   -  -  - STARS OR PLUS WRAPPING -  -  -  -  -  -  -  -  -  -  -  -   
+            ] ;-  -  -  -  -  -  -  -  -  -  -  -   -  -  -  -  -  STARS OR PLUS WRAPPING  -  -  -  -  -  -  -  -  -  -  -  -   
             [   (and (> (length S) 1) (or (equal? (second S) "*")(equal? (second S) "+")))
                 (if  (= (length S) 2)
                     (LOOP   (reverse (cons (list (first S) (second S))  (reverse TEMP)))   empty    PAR    OR    OR2)
                     (LOOP   (rest (rest S))   (reverse (cons (list (first S) (second S))  (reverse TEMP)))    PAR    OR    OR2)
                 )   
             ] 
-              ;-  -  -  -  -  -  -  -  -  -  -  -   -  -  - CHARACTERS ADDICTION -  -  -  -  -  -  -  -  -  -  -  -   -  -  - 
+              ;-  -  -  -  -  -  -  -  -  -  -  -   -  -  -  -  -  CHARACTERS ADDICTION  -  -  -  -  -  -  -  -  -  -  -  -   -
             [   else   (LOOP   (rest S)   (reverse (cons (first S) (reverse TEMP)))    PAR    OR    OR2)   ]
         )
     )
@@ -165,7 +186,7 @@
 
 ;-------------------------------------------- MACHINE SEQUENCE AND MACHINE EXPRESSION COMPARISON --------------------------------------------
  
-    (define-values (I DONE) (values 0 0))
+    (define-values (I DONE) (values 0 0))                             ; "I" variable is superfluous
     (let LOOP [(S SEQUENCE_LIST) (E (list EXPRESSION_LIST))]
                                                                       ;(displayln (~a "String "S "    Expression "E))
         (cond
@@ -195,14 +216,14 @@
                                    (when (= DONE 0)      (let LOOP2 [(X (first E)) (BREACK 0)]
                                        (LOOP S (append X (rest E)) )
                                        (when(and (= I 0) (= DONE 0) (< BREACK (length(flatten S))))  (LOOP2 (append(first E) X) (add1 BREACK)) )
-                                       ;(set! I 0) ;this latter is useless
+                                       ;(set! I 0) ;this variable is superfluous
                                    )                     )
                             )
                             (let() (set! E (cons(reverse(rest(reverse (first E)))) (rest E)) )
                                    (when (= DONE 0)      (let LOOP3 [(X (first E)) (BREACK 0)]
                                        (LOOP S (append X (rest E)) )
                                        (when(and (= I 0) (= DONE 0) (< BREACK (length(flatten S))))  (LOOP3 (append(first E) X) (add1 BREACK)) )
-                                       ;(set! I 0) ;this latter is useless
+                                       ;(set! I 0) ;this variable is superfluous
                                    )                     )
                             )
                         )
@@ -239,8 +260,11 @@
 
 ;||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| TESTS ||||||||||||||||||||||||||||||||||||||||||||||||
 
- ;(FSM2 "aabbbc" "ab*|ab*ab*c")
- ;(FSM2 "ciaohellocd" "a*(ciao|hello)* cd")
- (FSM2 "stop right go 1sec 1sec"  "go* 1sec* stop (left |right) go 1sec+")
- ;(FSM2 "stoprightgo1sec1sec"  " (go)*(1sec)  *stop(left  | right)go(1sec)+")
- ;(FSM2 "stoprightgo1sec1sec"  "(go)*(1sec)*stop(left|right)go(1sec)+")
+ (FSM "aabbac" "|ab*(|(|a | z(|))b*|)ab*c|(a(h|p(|)")
+ ;(FSM "ciaohellocd" "a*(ciao|hello)* cd")
+ ;(FSM "stop right go 1sec 1sec"  "go* 1sec* stop (left |right) go 1sec+")
+ ;(FSM "stoprightgo1sec1sec"  " (go)*(1sec)  *stop(left  | right)go(1sec)+")
+ ;(FSM "stoprightgo1sec1sec"  "(go)*(1sec)*stop(left|right)go(1sec)+")
+ ;(FSM "ppsssk" "(h|k(|)")
+ ;(FSM "abc" "|a(|bc")
+ ;(FSM "abc" "a|(b c)*")
