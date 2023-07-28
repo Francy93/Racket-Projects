@@ -2,19 +2,19 @@
 
 Welcome to the **Racket-Projects** repository! This repository contains four projects developed during the Computer Science first-year course, showcasing various applications of Racket programming language.
 
-## Project 1: Traffic-Lights
+## Project 1: [Traffic-Lights](https://github.com/Francy93/Racket-Projects/tree/master/Traffic-Lights)
 
 The first project focuses on Programming and Design using Racket. It involves building a Trafficlights simulation by integrating Racket with Arduino for a realistic experience.
 
-## Project 2: TuringMachine-Emulator
+## Project 2: [TuringMachine-Emulator](https://github.com/Francy93/Racket-Projects/tree/master/TuringMachine-Emulator)
 
 The second project presents a Virtual Turing Machine simulation implemented in Racket. Explore the fundamentals of Turing Machines and their computation capabilities.
 
-## Project 3: FSM-calculator
+## Project 3: [FSM-calculator](https://github.com/Francy93/Racket-Projects/tree/master/Dynamic-FSM)
 
 The third project involves a regex matcher developed in Racket. Delve into Finite State Machines and learn how to match regular expressions.
 
-## Project 4: Mirto-Robot
+## Project 4: [Mirto-Robot](https://github.com/Francy93/Racket-Projects/tree/master/Mirto-Robot)
 
 The fourth project combines Programming and Networking in Racket. Run a Racket network server on Raspberry Pi to control MIRTO (the Middlesex Robotic plaTfOrm), also known as Myrtle.
 
