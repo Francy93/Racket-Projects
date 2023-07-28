@@ -1,0 +1,2 @@
+All this "RAR" folders are actaully just one splitted in many ones, 
+hence, pease, use "WinRar" to extract the content from these compressed folders.
